@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner() {
+      return signedIn()
+        && request.auth.token.email == 'pwebsiter@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+    function isSelf(userId) { return signedIn() && request.auth.uid == userId; }
+
+    match /users/{userId} {
+      // Имэйл, токен үлдэгдэл зэрэг хувийн мэдээллийг зөвхөн өөрөө болон owner уншина
+      allow read: if isSelf(userId) || isOwner();
+      allow create: if isSelf(userId)
+        && request.resource.data.role == 'user'
+        && request.resource.data.plan == 'free';
+      // Энгийн хэрэглэгч өөрийн role / plan-г өөрчилж болохгүй
+      allow update: if isOwner()
+        || (isSelf(userId)
+            && request.resource.data.role == resource.data.role
+            && request.resource.data.plan == resource.data.plan);
+      allow delete: if isOwner();
+    }
+
+    match /sessions/{sessionId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if signedIn()
+        && (resource.data.userId == request.auth.uid || isOwner());
+    }
+
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+
+    match /transactions/{transactionId} {
+      allow read: if signedIn() && (resource.data.userId == request.auth.uid || isOwner());
+      // Хэрэглэгч зөвхөн өөрийн нэр дээр "pending" гүйлгээ үүсгэнэ
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'pending';
+      // Зөвшөөрөх / татгалзах нь зөвхөн owner
+      allow update, delete: if isOwner();
+    }
+  }
+}

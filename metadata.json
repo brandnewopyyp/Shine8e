@@ -1,0 +1,6 @@
+{
+  "name": "Gemini Mind - AI Solver, Homework & Web Grounding",
+  "description": "Монгол ба дэлхийн бүх хичээл, математикийн бодлого, шууд интернет хайлт, код боловсруулагч Gemini зэрэглэлийн хиймэл оюун ухаан.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

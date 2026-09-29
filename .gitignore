@@ -1,0 +1,11 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Discord bot/OAuth нууц түлхүүрүүд хадгалагддаг файл
+discord-config.json

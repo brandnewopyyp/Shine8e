@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && (request.auth.uid == userId || request.auth.token.email == 'pwebsiter@gmail.com');
+    }
+    match /sessions/{sessionId} {
+      allow read, write: if request.auth != null && (resource == null || resource.data.userId == request.auth.uid || request.auth.token.email == 'pwebsiter@gmail.com');
+    }
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'pwebsiter@gmail.com';
+    }
+    match /transactions/{transactionId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
